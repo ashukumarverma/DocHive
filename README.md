@@ -7,15 +7,15 @@ A powerful real-time collaborative editing application, built using the **MERN s
 ## 🚀 Features  
 
 - **Real-Time Collaboration**: Multiple users can edit the same document simultaneously.  
-- **Rich Text Editor**: Format text, add links, and include images.  
-- **User Authentication**: Secure login and role-based permissions.   
+- **Rich Text Editor**: Format text.  
+- **User Authentication**: Secure login.   
 
 ---
 
 ## 🛠️ Tech Stack  
 
 ### Frontend:  
-- **React.js** with **TailwindCSS** for a responsive and interactive UI.  
+- **React.js** with **Bootstrap** for UI.  
 
 ---
 
