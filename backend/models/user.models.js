@@ -14,7 +14,7 @@ userSchema.pre("save", async function (next) {
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  console.log("Hashed Password during Registration:", this.password);
+  // console.log("Hashed Password during Registration:", this.password);
   next(); // Ensure that next() is called after hashing
 });
 

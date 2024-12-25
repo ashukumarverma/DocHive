@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   // Variants for form and image transitions
   const formVariants = {
@@ -18,6 +22,37 @@ const Login = () => {
     exit: { opacity: 0, x: -100 }, // Image slides out to the left
   };
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        { email, password }
+      );
+
+      // Save user data in local storage
+      console.log(data.username);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ username: data.username, token: data.token })
+      );
+
+      // Navigate to dashboard
+      navigate("/dashboard");
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+        navigate("/login");
+      } else {
+        setError("An unexpected error occurred. Please try again later.");
+        navigate("/login");
+      }
+    }
+  };
   return (
     <section className="vh-100 pt-3">
       <div className="container-fluid h-custom">
@@ -47,7 +82,7 @@ const Login = () => {
             exit="exit"
             transition={{ duration: 0.5 }}
           >
-            <form>
+            <form onSubmit={handleLogin}>
               {/* Email input */}
               <div className="form-outline mb-4">
                 <label className="form-label" htmlFor="form3Example3">
@@ -81,13 +116,15 @@ const Login = () => {
 
               <div className="text-center text-lg-start mt-4 pt-2">
                 <motion.button
-                  type="button"
+                  type="submit"
                   className="btn btn-primary btn-lg"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
                   Login
                 </motion.button>
+                {error && <p className="text-danger mt-3">{error}</p>}
+                {/* Display error message */}
                 <p className="small fw-bold mt-2 pt-1 mb-0">
                   Don&apos;t have an account?{" "}
                   <a href="/register" className="link-danger">

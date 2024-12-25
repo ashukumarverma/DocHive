@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 
 const LandingPage = () => {
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  console.log(user + "from landing page");
+
   // Neon blink animation for the heading
   const neonVariants = {
     hidden: { opacity: 0.8 },
@@ -65,14 +69,18 @@ const LandingPage = () => {
           your thoughts, DocHive offers all the features you need to stay
           productive.
         </p>
-        <div className="mt-4">
-          <a href="/register" className="btn btn-outline-dark btn-lg me-3">
-            Register
-          </a>
-          <a href="/login" className="btn btn-outline-primary btn-lg">
-            Login
-          </a>
-        </div>
+        {user ? (
+          ""
+        ) : (
+          <div className="mt-4">
+            <a href="/register" className="btn btn-outline-dark btn-lg me-3">
+              Register
+            </a>
+            <a href="/login" className="btn btn-outline-primary btn-lg">
+              Login
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

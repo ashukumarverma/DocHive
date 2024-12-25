@@ -1,13 +1,17 @@
-// import { redirect, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
 
 const NavBar = () => {
-  // const navigate = useNavigate();
-  const userString = localStorage.getItem("user");
-  const user = userString ? JSON.parse(userString) : null;
-  // const user = userString ? JSON.parse(userString) : "username";
-  console.log(user);
+  const navigate = useNavigate();
+  const user = useContext(UserContext);
+  console.log(user + " from NavBar");
 
   //  handle logout and redirect to login page
+  const handleLogout = () => {
+    localStorage.removeItem("user"); // Remove user data from local storage
+    navigate("/"); // Redirect to landing page
+  };
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary navbar-light bg-light">
@@ -38,10 +42,13 @@ const NavBar = () => {
           </ul>
           {user ? (
             <ul className="navbar-nav">
+              <li className="nav-item my-auto">{user.username}</li>
               <li className="nav-item">
-                <button className="btn btn-link nav-link">
-                  {/* onClick={handleLogout} in button */}
-                  {user.username} Logout
+                <button
+                  className="btn btn-link nav-link"
+                  onClick={handleLogout}
+                >
+                  Logout
                 </button>
               </li>
             </ul>
