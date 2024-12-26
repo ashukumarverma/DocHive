@@ -16,6 +16,8 @@ A powerful real-time collaborative editing application, built using the **MERN s
 
 ### Frontend:  
 - **React.js** with **Bootstrap** for UI.  
+### Backend:  
+- **Express.js**, **MongoDB**, **JWT**  
 
 ---
 
@@ -47,12 +49,28 @@ Make sure the following are installed on your system:
    ```bash
    cd DocHive
    ```
-3. **Install dependencies**
+3. **Install dependencies in both frontend and backend directory**
+   for frontend
    ```bash
    cd frontend
    npm install
    ```
-4. **Run the Application**
+   similarly for backend
+   ```bash
+   cd backend
+   npm install
+   ```
+4. **Set Environment Variable**
+   - In Backend
+      - MONGO_URI = mongodb+srv://username:password@clusterName.-----.mongodb.net/?retryWrites=true&w=majority&appName=ClusterName (you can get it from MongoDB webpage or in app if locally installed)
+      - JWT_SECRET = Your_Secret
+      - PORT = 5000 (as per your choice)
+5. **Run the Application**
+   in frontend
    ```bash
    npm run dev
+   ```
+   in backend
+   ```bash
+   npm run start
    ```
