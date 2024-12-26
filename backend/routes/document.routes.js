@@ -1,6 +1,6 @@
 import { Router } from "express";
-import Document from "../models/Document";
-import verifyToken from "../middleware/middleware";
+import Document from "../models/document.models.js";
+import verifyToken from "../middleware/middleware.js";
 
 const router = Router();
 // all documents for logged in user

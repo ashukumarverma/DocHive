@@ -4,12 +4,13 @@ import http from "http";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js"; // importing the connectDB function from the db.js file
-import authRoutes from "./routes/auth.routes.js"; // Import the default export
-
-const PORT = process.env.PORT || 5000; // setting the port number
+import authRoutes from "./routes/auth.routes.js";
+import documentRoutes from "./routes/document.routes.js";
 
 dotenv.config(); // setting up the config file
 connectDB(); // connecting to the database
+
+const PORT = process.env.PORT || 5000; // setting the port number
 
 const app = express(); // initializing the express app
 const server = http.createServer(app); // creating a server
@@ -24,8 +25,11 @@ app.use(
 ); // using the cors middleware
 
 app.use(express.json()); // using the express.json middleware
-app.use("/api/auth", authRoutes); // using the authRoutes middleware
+app.use("/auth", authRoutes); // using the authRoutes middleware
+app.use("/documents", documentRoutes); // using the documentRoutes middleware
 
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT} -> this log is from server.js`);
+  console.log(
+    `Server is running on port ${PORT} -> this log is from server.js`
+  );
 });
