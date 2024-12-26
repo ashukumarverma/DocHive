@@ -4,7 +4,7 @@ import http from "http";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js"; // importing the connectDB function from the db.js file
-import authRoutes from "./routes/auth.js"; // Import the default export
+import authRoutes from "./routes/auth.routes.js"; // Import the default export
 
 const PORT = process.env.PORT || 5000; // setting the port number
 
@@ -27,5 +27,5 @@ app.use(express.json()); // using the express.json middleware
 app.use("/api/auth", authRoutes); // using the authRoutes middleware
 
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT} -> this log is from server.js`);
 });
