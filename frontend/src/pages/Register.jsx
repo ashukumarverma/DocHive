@@ -28,7 +28,7 @@ const Register = () => {
     setError(""); // Clear any previous errors
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/auth/register",
+        "http://localhost:5000/api/auth/register",
         { name, email, password }
       );
       localStorage.setItem("token", data.token);
