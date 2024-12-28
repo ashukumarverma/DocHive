@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
 
 const Login = () => {
+  const { setUser } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
   // Variants for form and image transitions
   const formVariants = {
     hidden: { opacity: 0, x: -100 }, // Form starts off-screen to the left
@@ -30,12 +31,10 @@ const Login = () => {
         { email, password }
       );
 
-      // Save user data in local storage
-      console.log(data.username);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ username: data.username, token: data.token })
-      );
+      // Save user data in localStorage and update context
+      const userData = { username: data.username, token: data.token };
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
 
       // Navigate to dashboard
       navigate("/dashboard");
@@ -46,10 +45,8 @@ const Login = () => {
         error.response.data.message
       ) {
         setError(error.response.data.message);
-        navigate("/login");
       } else {
         setError("An unexpected error occurred. Please try again later.");
-        navigate("/login");
       }
     }
   };
@@ -85,7 +82,7 @@ const Login = () => {
             <form onSubmit={handleLogin}>
               {/* Email input */}
               <div className="form-outline mb-4">
-                <label className="form-label" htmlFor="form3Example3">
+                <label className="form-label" htmlFor="email">
                   Email address
                 </label>
                 <input
@@ -100,7 +97,7 @@ const Login = () => {
               </div>
               {/* Password input */}
               <div className="form-outline mb-3">
-                <label className="form-label" htmlFor="form3Example4">
+                <label className="form-label" htmlFor="password">
                   Password
                 </label>
                 <input

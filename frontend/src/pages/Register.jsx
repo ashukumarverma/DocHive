@@ -32,7 +32,7 @@ const Register = () => {
         { name, email, password }
       );
       localStorage.setItem("token", data.token);
-      navigate("/"); // Redirect to login if registration is successful
+      navigate("/login"); // Redirect to login if registration is successful
     } catch (error) {
       if (
         error.response &&
@@ -63,7 +63,7 @@ const Register = () => {
             <form onSubmit={handleRegister}>
               {/* Name input */}
               <div className="form-outline mb-4">
-                <label className="form-label" htmlFor="form3Example3">
+                <label className="form-label" htmlFor="name">
                   Username
                 </label>
                 <input
@@ -78,7 +78,7 @@ const Register = () => {
               </div>
               {/* Email input */}
               <div className="form-outline mb-4">
-                <label className="form-label" htmlFor="form3Example3">
+                <label className="form-label" htmlFor="email">
                   Email address
                 </label>
                 <input
@@ -93,7 +93,7 @@ const Register = () => {
               </div>
               {/* Password input */}
               <div className="form-outline mb-3">
-                <label className="form-label" htmlFor="form3Example4">
+                <label className="form-label" htmlFor="password">
                   Password
                 </label>
                 <input
@@ -116,7 +116,8 @@ const Register = () => {
                 >
                   Register
                 </motion.button>
-                {error && <p className="text-danger mt-3">{error}</p>}{/* Display error message */}
+                {error && <p className="text-danger mt-3">{error}</p>}
+                {/* Display error message */}
                 <p className="small fw-bold mt-2 pt-1 mb-0">
                   Already have an account?{" "}
                   <a href="/login" className="link-primary">

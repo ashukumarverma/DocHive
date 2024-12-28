@@ -4,13 +4,13 @@ import { UserContext } from "../App";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const user = useContext(UserContext);
-  console.log(user + " from NavBar");
+  const { user, setUser } = useContext(UserContext);
 
-  //  handle logout and redirect to login page
+  // Handle logout and redirect to login page
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Remove user data from local storage
-    navigate("/"); // Redirect to landing page
+    localStorage.removeItem("user"); // Remove user data from localStorage
+    setUser(null); // Update user state
+    navigate("/"); // Redirect to the landing page
   };
 
   return (
