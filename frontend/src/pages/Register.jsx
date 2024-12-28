@@ -31,7 +31,6 @@ const Register = () => {
         "http://localhost:5000/api/auth/register",
         { name, email, password }
       );
-      localStorage.setItem("token", data.token);
       navigate("/login"); // Redirect to login if registration is successful
     } catch (error) {
       if (
