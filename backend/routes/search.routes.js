@@ -7,9 +7,9 @@ const router = express.Router();
 router.get("/", verifyToken, async (req, res) => {
   const { query } = req.query; // Extract the search query from the query parameters
 
-  if (!query) {
-    return res.status(400).json({ message: "Search query is required" });
-  }
+  // if (!query) {
+  //   return res.status(400).json({ message: "Search query is required" });
+  // }
 
   try {
     const documents = await Document.find({
