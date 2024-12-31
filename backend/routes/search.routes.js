@@ -5,12 +5,7 @@ import verifyToken from "../middleware/middleware.js";
 const router = express.Router();
 
 router.get("/", verifyToken, async (req, res) => {
-  const { query } = req.query; // Extract the search query from the query parameters
-
-  // if (!query) {
-  //   return res.status(400).json({ message: "Search query is required" });
-  // }
-
+  const { query = "" } = req.query; // Get the query from the URL query string
   try {
     const documents = await Document.find({
       $or: [

@@ -14,57 +14,43 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg bg-body-tertiary navbar-light bg-light d-flex">
       <div className="container-fluid">
         <a className="navbar-brand" href="/">
           DocHive
         </a>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+        <div
+          className="d-flex justify-content-between  align-items-center  flex-fill "
+          id="navbarNav"
         >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
+          <div className="navbar-nav my-auto">
+            <span className="nav-item">
               <a className="nav-link" href="/dashboard">
                 Dashboard
               </a>
-            </li>
-          </ul>
+            </span>
+          </div>
           {user ? (
-            <ul className="navbar-nav">
-              <li className="nav-item my-auto">{user.username}</li>
-              <li className="nav-item">
-                <button
-                  className="btn btn-link nav-link"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              </li>
-            </ul>
+            <div className="d-flex gap-2">
+              <span className="nav-item my-auto">{user.username}</span>
+              <button className="btn btn-link nav-link text-danger" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
           ) : (
-            <ul className="navbar-nav">
-              <li className="nav-item">
+            <div className="d-flex gap-2">
+              <span className="nav-item my-auto">
                 <a className="nav-link text-primary" href="/login">
                   Login
                 </a>
-              </li>
-              <li className="nav-item">
+              </span>
+              <span className="nav-item">
                 <a className="nav-link" href="/register">
                   Register
                 </a>
-              </li>
-            </ul>
+              </span>
+            </div>
           )}
         </div>
       </div>

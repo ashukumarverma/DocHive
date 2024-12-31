@@ -6,6 +6,7 @@ import ErrorPage from "./pages/ErrorPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { createContext, useState, useEffect } from "react";
+import Editor from "./pages/Editor";
 
 const UserContext = createContext();
 
@@ -26,6 +27,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/document/:documentId" element={<Editor />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="*" element={<ErrorPage />} />
