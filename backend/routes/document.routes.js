@@ -1,8 +1,48 @@
 import { Router } from "express";
 import Document from "../models/document.models.js"; // Import Document model
 import verifyToken from "../middleware/middleware.js"; // Import the token verification middleware
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const router = Router();
+
+router.post("/share/:id", verifyToken, async (req, res) => {
+  try {
+    const document = await Document.findById(req.params.id);
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    if (document.owner.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const shareUrl = `${FRONTEND_URL}/editor/shared/${req.params.id}`;
+    res.json({ shareUrl });
+  } catch (error) {
+    res.status(500).json({ message: error.message + "from share route" });
+  }
+});
+
+// Get a shared document and set current user in shared in sharedWith
+router.get("/shared/:id", verifyToken, async (req, res) => {
+  try {
+    const currUser = req.user.id;
+    const document = await Document.findById(req.params.id);
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" }); // Document not found error
+    }
+    if (
+      document.owner.toString() !== currUser &&
+      !document.sharedWith.includes(currUser)
+    ) {
+      document.sharedWith.push(currUser);
+      await document.save();
+    }
+    res.json(document);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Get all documents for the logged-in user
 router.get("/", verifyToken, async (req, res) => {
@@ -12,6 +52,16 @@ router.get("/", verifyToken, async (req, res) => {
     // Fetch documents where owner matches the logged-in user
     const documents = await Document.find({ owner: req.user.id });
     res.json(documents); // Respond with the documents found
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// get all shared documents
+router.get("/shared", verifyToken, async (req, res) => {
+  try {
+    const documents = await Document.find({ sharedWith: req.user.id });
+    res.json(documents);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
