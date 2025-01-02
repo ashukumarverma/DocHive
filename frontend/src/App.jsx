@@ -28,6 +28,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/document/:documentId" element={<Editor />} />
+          <Route path="/editor/shared/:sharedId" element={<Editor />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="*" element={<ErrorPage />} />

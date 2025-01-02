@@ -4,17 +4,18 @@ import {
   fetchAllDocuments,
   searchedDocuments,
   deleteDocument,
+  getAllSharedDocuments,
 } from "../api/document";
 import DocumentForm from "../components/DocumentForm";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [documents, setDocuments] = useState([]);
+  const [sharedDocuments, setSharedDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showForm, setShowForm] = useState(false);
-  // const [currentDocument, setCurrentDocument] = useState(null); // For editing
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -30,13 +31,16 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       const docs = await fetchAllDocuments(); // Call the API to fetch documents
+      const sharedDocs = await getAllSharedDocuments();
       setDocuments(docs); // Update state with fetched documents
+      setSharedDocuments(sharedDocs); // Update state with fetched all shared documents
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch documents");
     } finally {
       setLoading(false); // Set loading to false after fetching
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -90,39 +94,68 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
+
       {message && <div className="alert alert-success">{message}</div>}
       <div className="w-90">
+        <h4>Your Documents</h4>
         {documents.length === 0 ? (
           <p>No documents found</p>
         ) : (
-          <div className="d-flex flex-wrap gap-3 justify-content-center">
-            {documents.map((doc) => (
-              <div key={doc._id}>
-                <DocCard
-                  id={doc._id}
-                  title={doc.title}
-                  content={doc.content}
-                  createdAt={doc.createdAt}
-                />
+          <div className="d-flex flex-wrap gap-3">
+            {documents.map((doc) => {
+              return (
+                <div key={doc._id} className="">
+                  <DocCard
+                    id={doc._id}
+                    title={doc.title}
+                    content={doc.content}
+                    createdAt={doc.createdAt}
+                  />
 
-                <div className="d-flex gap-3 justify-content-between pt-2">
-                  <button
-                    className="card-link btn btn-outline-dark"
-                    onClick={() => navigate(`/document/${doc._id}`)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="card-link btn btn-outline-danger"
-                    onClick={() => {
-                      handleDelete(doc._id);
-                    }}
-                  >
-                    Delete
-                  </button>
+                  <div className="d-flex gap-2 justify-content-between pt-1">
+                    <button
+                      className="card-link btn btn-outline-dark flex-fill"
+                      onClick={() => navigate(`/document/${doc._id}`)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="card-link btn btn-outline-danger flex-fill"
+                      onClick={() => {
+                        handleDelete(doc._id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+        )}
+        {sharedDocuments.length > 0 && (
+          <div className="mt-4">
+            <h4>Documents Shared with you</h4>
+            <div className="d-flex flex-wrap gap-3">
+              {sharedDocuments.map((doc) => {
+                return (
+                  <div className="d-flex flex-column" key={doc._id}>
+                    <DocCard
+                      id={doc._id}
+                      title={doc.title}
+                      content={doc.content}
+                      createdAt={doc.createdAt}
+                    />
+                    <button
+                      className="card-link btn btn-outline-dark mt-2 flex-fill"
+                      onClick={() => navigate(`/editor/shared/${doc._id}`)}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
