@@ -12,6 +12,7 @@ dotenv.config();
 connectDB();
 
 const PORT = process.env.PORT || 5000;
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server using Express app
@@ -19,7 +20,7 @@ const server = http.createServer(app); // Create HTTP server using Express app
 // Enable Cross-Origin Resource Sharing (CORS)
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow only this origin (Frontend URL)
+    origin: { FRONTEND_URL }, // Allow only this origin (Frontend URL)
     methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   })
@@ -27,11 +28,11 @@ app.use(
 
 // Socket.io setup for real-time collaboration
 const io = new Server(server, {
-    cors: {
-        origin: 'http://localhost:5173', 
-        methods: ['GET', 'POST']
-    }
-})
+  cors: {
+    origin: { FRONTEND_URL },
+    methods: ["GET", "POST"],
+  },
+});
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
