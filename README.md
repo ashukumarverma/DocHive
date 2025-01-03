@@ -45,24 +45,26 @@ Make sure the following are installed on your system:
    cd DocHive
    ```
 3. **Install dependencies in both frontend and backend directory**
-   for frontend
+   - for frontend
    ```bash
    cd frontend
    npm install
    ```
-   similarly for backend
+   - similarly for backend
    ```bash
    cd backend
    npm install
    ```
 4. **Set Environment Variable**
    - In Backend
+      - in frontend folder create a .env.development file and write these variables
       - MONGO_URI = mongodb+srv://username:password@clusterName.-----.mongodb.net/?retryWrites=true&w=majority&appName=ClusterName (you can get it from MongoDB webpage or in app if locally installed)
       - JWT_SECRET = Your_Secret
       - PORT = 5000 (as per your choice)
       - FRONTEND_URL=http://localhost:5173 (this is frontend url)
 
-   - In Frontend
+   - In Frontend 
+      - in frontend folder create a .env.development file and write these variables
       - VITE_BASE_URL=http://localhost:5000  (this is backend server url)
 
 5. **Run the Application**

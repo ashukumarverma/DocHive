@@ -8,6 +8,9 @@ import {
   shareDocument,
 } from "../api/document";
 import socket from "../api/socket";
+import { Editor as TinyMCEEditor } from "@tinymce/tinymce-react";
+
+const tinyMceApiKey = import.meta.env.VITE_TINYMCE_API_KEY;
 
 const Editor = () => {
   console.log(socket.id);
@@ -156,10 +159,10 @@ const Editor = () => {
       </div>
       <div className="form-group mt-3">
         <label htmlFor="content">Content:</label>
-        <textarea
+        {/* <textarea
           id="content"
           className="form-control"
-          rows="5"
+          rows="10"
           value={content}
           onChange={(e) => {
             setContent(e.target.value);
@@ -168,8 +171,29 @@ const Editor = () => {
               title,
               content: e.target.value,
             });
+            handleUpdate();
           }}
-        />
+        /> */}
+        <div id="content">
+          <TinyMCEEditor
+            apiKey={tinyMceApiKey}
+            init={{
+              plugins:
+                "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount",
+              toolbar:
+                "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
+            }}
+            value={content}
+            onEditorChange={(newContent) => {
+              setContent(newContent);
+              socket.emit("documentUpdate", {
+                documentId: documentId || sharedId,
+                title,
+                content: newContent,
+              });
+            }}
+          />
+        </div>
 
         {successMessage && (
           <div className="alert alert-success mt-3">{successMessage}</div>
@@ -184,7 +208,13 @@ const Editor = () => {
               <button className="btn btn-danger ms-2" onClick={handleDelete}>
                 Delete Document
               </button>
-              <button className="btn btn-primary ms-2" onClick={handleShare}>
+              <button
+                className="btn btn-primary ms-2"
+                onClick={() => {
+                  handleShare();
+                  setSuccessMessage("Generating shareable link");
+                }}
+              >
                 Share Document
               </button>
             </div>
