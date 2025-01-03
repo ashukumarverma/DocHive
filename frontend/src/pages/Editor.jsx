@@ -7,8 +7,11 @@ import {
   getSharedDocument,
   shareDocument,
 } from "../api/document";
+import socket from "../api/socket";
 
 const Editor = () => {
+  console.log(socket.id);
+
   const { documentId, sharedId } = useParams();
   const [document, setDocument] = useState(null);
   const [title, setTitle] = useState("");
@@ -58,9 +61,25 @@ const Editor = () => {
     fetchSharedDocument();
   }, [sharedId]);
 
+  useEffect(() => {
+    socket.emit("joinDocument", documentId || sharedId);
+    socket.on("receiveUpdate", (updatedData) => {
+      if (updatedData.title) {
+        setTitle(updatedData.title);
+      }
+      if (updatedData.content) {
+        setContent(updatedData.content);
+      }
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [documentId, sharedId]);
+
   const handleUpdate = async () => {
     try {
       await updateDocument(documentId || sharedId, { title, content });
+      socket.emit("updateDocument", { documentId, title, content });
       setSuccessMessage("Document updated successfully");
     } catch (error) {
       setError("Failed to update document");
@@ -118,6 +137,11 @@ const Editor = () => {
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
+            socket.emit("documentUpdate", {
+              documentId: documentId || sharedId,
+              title: e.target.value,
+              content,
+            });
           }}
         />
         <button
@@ -139,6 +163,11 @@ const Editor = () => {
           value={content}
           onChange={(e) => {
             setContent(e.target.value);
+            socket.emit("documentUpdate", {
+              documentId: documentId || sharedId,
+              title,
+              content: e.target.value,
+            });
           }}
         />
 

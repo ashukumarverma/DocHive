@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
+import { baseURL } from "./axiosInstance";
 
-const socket = io("http://localhost:5000");
+const socket = io(baseURL);
 
 export default socket;

@@ -43,21 +43,16 @@ app.use("/api/documents", documentRoutes);
 app.use("/api/search", searchDocumentRoutes);
 
 io.on("connection", (socket) => {
-  console.log("New WebSocket connection");
+  // console.log("New Socket connection", socket.id);
 
-  //user on documentdetails - useuseffect
   socket.on("joinDocument", (documentId) => {
     socket.join(documentId);
-    console.log(`User joined document ${documentId}`);
+    console.log(`User joined the document ${documentId}`);
   });
   // user when changes the input feild values
   socket.on("documentUpdate", ({ documentId, title, content }) => {
     socket.to(documentId).emit("receiveUpdate", { title, content });
-  });
-
-  //this is not used by the frontend
-  socket.on("sendMessage", ({ documentId, message }) => {
-    socket.to(documentId).emit("receiveMessage", message);
+    console.log(`User updated document ${documentId}, ${title} , ${content}`);
   });
 });
 
