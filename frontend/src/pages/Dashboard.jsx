@@ -97,11 +97,13 @@ const Dashboard = () => {
 
       {message && <div className="alert alert-success">{message}</div>}
       <div className="w-90">
-        <h4>Your Documents</h4>
+        <h4 className="bg-dark bg-opacity-10 rounded px-2 py-2">
+          Your Documents
+        </h4>
         {documents.length === 0 ? (
           <p>No documents found</p>
         ) : (
-          <div className="d-flex flex-wrap gap-3">
+          <div className="d-flex flex-wrap gap-3 px-5 justify-content-center">
             {documents.map((doc) => {
               return (
                 <div key={doc._id} className="">
@@ -135,8 +137,10 @@ const Dashboard = () => {
         )}
         {sharedDocuments.length > 0 && (
           <div className="mt-4">
-            <h4>Documents Shared with you</h4>
-            <div className="d-flex flex-wrap gap-3">
+            <h4 className="bg-dark bg-opacity-10 rounded px-2 py-2">
+              Documents Shared with you
+            </h4>
+            <div className="d-flex flex-wrap gap-3 px-5 justify-content-center">
               {sharedDocuments.map((doc) => {
                 return (
                   <div className="d-flex flex-column" key={doc._id}>

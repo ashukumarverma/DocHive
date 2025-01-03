@@ -4,18 +4,18 @@ import {
   getDocumentById,
   updateDocument,
   deleteDocument,
+  getSharedDocument,
+  shareDocument,
 } from "../api/document";
-import io from "socket.io-client";
 
 const Editor = () => {
-  const socket = io("http://localhost:5000");
-
-  const { documentId } = useParams();
+  const { documentId, sharedId } = useParams();
   const [document, setDocument] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [successMessage, setSuccessMessage] = useState(null);
   const [error, setError] = useState(null);
+  const [shareableLink, setShareableLink] = useState(null);
 
   const location = useLocation();
   const message = location.state?.message;
@@ -23,6 +23,9 @@ const Editor = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!documentId) {
+      return;
+    }
     const fetchDocument = async () => {
       try {
         const doc = await getDocumentById(documentId);
@@ -38,29 +41,27 @@ const Editor = () => {
   }, [documentId]);
 
   useEffect(() => {
-    socket.emit("join-document", documentId);
-    socket.on("reieveUpdate", (updatedData) => {
-      if (updatedData.title) {
-        setTitle(updatedData.title);
+    if (!sharedId) {
+      return;
+    }
+    const fetchSharedDocument = async () => {
+      try {
+        const doc = await getSharedDocument(sharedId);
+        setDocument(doc);
+        setTitle(doc.title);
+        setContent(doc.content);
+      } catch (error) {
+        setError("Failed to fetch shared document");
+        console.log(error);
       }
-      if (updatedData.content) {
-        setContent(updatedData.content);
-      }
-    });
-    socket.on("recieveUpdatedContent", (updatedContent) => {
-      setContent(updatedContent);
-    });
-    return () => {
-      socket.disconnect();
     };
-  }, [documentId, socket]);
+    fetchSharedDocument();
+  }, [sharedId]);
 
   const handleUpdate = async () => {
     try {
-      await updateDocument(documentId, { title, content });
-      socket.emit("update-document", { documentId, title, content });
+      await updateDocument(documentId || sharedId, { title, content });
       setSuccessMessage("Document updated successfully");
-      navigate("/document/${documentId}");
     } catch (error) {
       setError("Failed to update document");
       console.log(error);
@@ -77,6 +78,24 @@ const Editor = () => {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      const response = await shareDocument(documentId);
+      setShareableLink(response.shareUrl);
+      console.log(response.shareUrl + "from share button");
+    } catch (error) {
+      setError("Failed to share document");
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (successMessage !== "") {
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 1000);
+    }
+  }, [successMessage]);
+
   if (error) {
     return <div className="container mt-4 alert alert-danger">{error}</div>;
   }
@@ -86,10 +105,10 @@ const Editor = () => {
   }
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 d-fle">
       {message && <div className="alert alert-success">{message}</div>}
-      <div className="form-group">
-        <label className="" htmlFor="title">
+      <div className="form-group d-flex gap-2 item-align-center">
+        <label className="my-auto" htmlFor="title">
           Title:
         </label>
         <input
@@ -99,13 +118,17 @@ const Editor = () => {
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
-            socket.emit("documentUpdate", {
-              documentId: documentId,
-              title: e.target.value,
-              content,
-            });
           }}
         />
+        <button
+          className="btn btn-danger"
+          onClick={() => {
+            handleUpdate;
+            navigate(`/dashboard`);
+          }}
+        >
+          Close
+        </button>
       </div>
       <div className="form-group mt-3">
         <label htmlFor="content">Content:</label>
@@ -116,11 +139,6 @@ const Editor = () => {
           value={content}
           onChange={(e) => {
             setContent(e.target.value);
-            socket.emit("documentUpdate", {
-              documentId: documentId,
-              title,
-              content: e.target.value,
-            });
           }}
         />
 
@@ -128,13 +146,31 @@ const Editor = () => {
           <div className="alert alert-success mt-3">{successMessage}</div>
         )}
 
-        <div className="mt-3">
+        <div className="mt-3 d-flex">
           <button className="btn btn-primary" onClick={handleUpdate}>
             Update Document
           </button>
-          <button className="btn btn-danger ms-2" onClick={handleDelete}>
-            Delete Document
-          </button>
+          {!sharedId && (
+            <div className="d-flex gap-2">
+              <button className="btn btn-danger ms-2" onClick={handleDelete}>
+                Delete Document
+              </button>
+              <button className="btn btn-primary ms-2" onClick={handleShare}>
+                Share Document
+              </button>
+            </div>
+          )}
+          {shareableLink && (
+            <button
+              className="btn btn-dark ms-2"
+              onClick={() => {
+                setSuccessMessage("Link copied to clipboard");
+                navigator.clipboard.writeText(shareableLink);
+              }}
+            >
+              Copy Link
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 
 const DocumentForm = ({ onClose }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +22,16 @@ const DocumentForm = ({ onClose }) => {
   };
 
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0, 0, 0, 0.5)" }}>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(0, 0, 0, 0.5)",
+      }}
+    >
       <div className="position-absolute top-50 start-50 translate-middle w-75">
         <div className="container-fluid w-100 p-5 bg-light shadow-lg rounded">
           <h2>Create New Document</h2>
@@ -46,7 +57,15 @@ const DocumentForm = ({ onClose }) => {
             </div>
             {message && <div className="alert alert-success">{message}</div>}
             <div className="mt-2 d-flex justify-content-between">
-              <button type="submit" className="btn btn-success">
+              <button
+                type="submit"
+                className="btn btn-success"
+                disabled={!title || !content}
+                onClick={() => {
+                  handleSubmit();
+                  navigate("/dashboard");
+                }}
+              >
                 Create
               </button>
               <button

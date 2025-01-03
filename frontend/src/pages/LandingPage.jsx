@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import DocumentForm from "../components/DocumentForm";
 
 const LandingPage = () => {
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
   console.log(user + "from landing page");
-
+  const [showForm, setShowForm] = useState(false);
   // Neon blink animation for the heading
   const neonVariants = {
     hidden: { opacity: 0.8 },
@@ -69,6 +71,23 @@ const LandingPage = () => {
           your thoughts, DocHive offers all the features you need to stay
           productive.
         </p>
+
+        <button
+          onClick={() => {
+            setShowForm(true);
+          }}
+          className="btn btn-outline-dark"
+        >
+          Create new Document
+        </button>
+        {showForm && (
+          <DocumentForm
+            onClose={() => {
+              setShowForm(false);
+            }}
+          />
+        )}
+
         {user ? (
           ""
         ) : (
