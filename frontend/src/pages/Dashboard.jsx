@@ -22,7 +22,8 @@ const Dashboard = () => {
   const handleSearch = async () => {
     try {
       const docs = await searchedDocuments(searchQuery); // Call the API to fetch documents
-      setDocuments(docs); // Update state with fetched documents
+      setDocuments(docs.documents); // Update state with fetched documents
+      setSharedDocuments(docs.sharedDocuments); // Update state with fetched all shared documents
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch documents");
     }

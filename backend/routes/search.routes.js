@@ -15,7 +15,15 @@ router.get("/", verifyToken, async (req, res) => {
       owner: req.user.id, // Ensure the documents belong to the logged-in user
     });
 
-    res.json(documents);
+    const sharedDocuments = await Document.find({
+      $or: [
+        { title: { $regex: query, $options: "i" } }, // Search by title (case-insensitive)
+        { content: { $regex: query, $options: "i" } }, // Search by content (case-insensitive)
+      ],
+      sharedWith: req.user.id, // Ensure the documents belong to the logged-in user
+    });
+
+    res.json({ documents, sharedDocuments });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
