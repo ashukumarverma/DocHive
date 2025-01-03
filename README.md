@@ -7,7 +7,8 @@ A powerful real-time collaborative editing application, built using the **MERN s
 ## 🚀 Features  
 
 - **Real-Time Collaboration**: Multiple users can edit the same document simultaneously. 
-- **User Authentication**: Secure login.   
+- **User Authentication**: Secure login.
+-  **Rich Text Editor**: Format text.    
 
 ---
 
@@ -66,6 +67,7 @@ Make sure the following are installed on your system:
    - In Frontend 
       - in frontend folder create a .env.development file and write these variables
       - VITE_BASE_URL=http://localhost:5000  (this is backend server url)
+      - VITE_TINYMCE_API_KEY=your_api_KEY
 
 5. **Run the Application**
    - for backend
