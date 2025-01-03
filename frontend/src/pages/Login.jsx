@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
+import { baseURL } from "../api/axiosInstance";
 
 const Login = () => {
   const { setUser } = useContext(UserContext);
@@ -27,7 +28,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${baseURL}/api/auth/login`,
         { email, password }
       );
 

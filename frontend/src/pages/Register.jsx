@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "../api/axiosInstance";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -27,10 +28,11 @@ const Register = () => {
     e.preventDefault();
     setError(""); // Clear any previous errors
     try {
-      const { data } = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        { name, email, password }
-      );
+      const { data } = await axios.post(`${baseURL}/api/auth/register`, {
+        name,
+        email,
+        password,
+      });
       navigate("/login"); // Redirect to login if registration is successful
     } catch (error) {
       if (
