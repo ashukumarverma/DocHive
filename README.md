@@ -6,18 +6,13 @@ A powerful real-time collaborative editing application, built using the **MERN s
 
 ## 🚀 Features  
 
-- **Real-Time Collaboration**: Multiple users can edit the same document simultaneously.  
-- **Rich Text Editor**: Format text.  
+- **Real-Time Collaboration**: Multiple users can edit the same document simultaneously. 
 - **User Authentication**: Secure login.   
 
 ---
 
-## 🛠️ Tech Stack  
-
-### Frontend:  
-- **React.js** with **Bootstrap** for UI.  
-### Backend:  
-- **Express.js**, **MongoDB**, **JWT**  
+## 🛠️ Tech Stack - MERN 
+- **MongoDB**, **Express.js**, **React.js**, **Node.js**, **Socket.io**, **Bootstrap**, **JWT**  
 
 ---
 
@@ -32,7 +27,7 @@ Make sure the following are installed on your system:
 
 ### Installation  
 
-1. **Clone the repository**
+1. **Clone the repository using any of the following method**
    - web clone
      ```bash
      git clone https://github.com/ashukumarverma/DocHive.git
@@ -65,12 +60,17 @@ Make sure the following are installed on your system:
       - MONGO_URI = mongodb+srv://username:password@clusterName.-----.mongodb.net/?retryWrites=true&w=majority&appName=ClusterName (you can get it from MongoDB webpage or in app if locally installed)
       - JWT_SECRET = Your_Secret
       - PORT = 5000 (as per your choice)
+      - FRONTEND_URL=http://localhost:5173 (this is frontend url)
+
+   - In Frontend
+      - VITE_BASE_URL=http://localhost:5000  (this is backend server url)
+
 5. **Run the Application**
-   in frontend
+   - for backend
+   ```bash
+   npm run server
+   ```
+    - for frontend
    ```bash
    npm run dev
-   ```
-   in backend
-   ```bash
-   npm run start
    ```
