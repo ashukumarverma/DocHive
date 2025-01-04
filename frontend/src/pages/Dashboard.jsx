@@ -21,6 +21,9 @@ const Dashboard = () => {
 
   const handleSearch = async () => {
     try {
+      if (searchQuery.trim() === "") {
+        return fetchData(); // If search query is empty, fetch all documents
+      }
       const docs = await searchedDocuments(searchQuery); // Call the API to fetch documents
       setDocuments(docs.documents); // Update state with fetched documents
       setSharedDocuments(docs.sharedDocuments); // Update state with fetched all shared documents
@@ -87,6 +90,7 @@ const Dashboard = () => {
             placeholder="Search documents"
             onChange={(e) => {
               setSearchQuery(e.target.value);
+              handleSearch();
             }}
             required
           />
