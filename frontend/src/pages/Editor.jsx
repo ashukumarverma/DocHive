@@ -13,7 +13,7 @@ import { Editor as TinyMCEEditor } from "@tinymce/tinymce-react";
 const tinyMceApiKey = import.meta.env.VITE_TINYMCE_API_KEY;
 
 const Editor = () => {
-  console.log(socket.id);
+  console.log("Socket ID:", socket.id);
 
   const { documentId, sharedId } = useParams();
   const [document, setDocument] = useState(null);
@@ -22,11 +22,36 @@ const Editor = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [error, setError] = useState(null);
   const [shareableLink, setShareableLink] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   const location = useLocation();
   const message = location.state?.message;
 
   const navigate = useNavigate();
+
+  // Socket connection status
+  useEffect(() => {
+    const handleConnect = () => {
+      setIsConnected(true);
+      console.log("Socket connected");
+    };
+
+    const handleDisconnect = () => {
+      setIsConnected(false);
+      console.log("Socket disconnected");
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    // Set initial connection status
+    setIsConnected(socket.connected);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
+  }, []);
 
   useEffect(() => {
     if (!documentId) {
@@ -64,25 +89,44 @@ const Editor = () => {
     fetchSharedDocument();
   }, [sharedId]);
 
+  // Socket event handling for collaborative editing
   useEffect(() => {
-    socket.emit("joinDocument", documentId || sharedId);
-    socket.on("receiveUpdate", (updatedData) => {
-      if (updatedData.title) {
+    const currentDocumentId = documentId || sharedId;
+    if (!currentDocumentId) return;
+
+    // Join the document room
+    socket.emit("joinDocument", currentDocumentId);
+
+    // Listen for updates from other users
+    const handleReceiveUpdate = (updatedData) => {
+      console.log("Received update from other user:", updatedData);
+      if (updatedData.title !== undefined) {
         setTitle(updatedData.title);
       }
-      if (updatedData.content) {
+      if (updatedData.content !== undefined) {
         setContent(updatedData.content);
       }
-    });
+    };
+
+    socket.on("receiveUpdate", handleReceiveUpdate);
+
+    // Cleanup function - only remove event listeners, don't disconnect socket
     return () => {
-      socket.disconnect();
+      socket.off("receiveUpdate", handleReceiveUpdate);
+      // Leave the document room when component unmounts
+      socket.emit("leaveDocument", currentDocumentId);
     };
   }, [documentId, sharedId]);
 
   const handleUpdate = async () => {
     try {
       await updateDocument(documentId || sharedId, { title, content });
-      socket.emit("updateDocument", { documentId, title, content });
+      // Emit update to other users
+      socket.emit("updateDocument", { 
+        documentId: documentId || sharedId, 
+        title, 
+        content 
+      });
       setSuccessMessage("Document updated successfully");
     } catch (error) {
       setError("Failed to update document");
@@ -110,6 +154,7 @@ const Editor = () => {
       console.log(error);
     }
   };
+
   useEffect(() => {
     if (successMessage !== "") {
       setTimeout(() => {
@@ -129,6 +174,12 @@ const Editor = () => {
   return (
     <div className="container mt-4 d-fle">
       {message && <div className="alert alert-success">{message}</div>}
+      
+      {/* Connection status indicator */}
+      <div className={`alert ${isConnected ? 'alert-success' : 'alert-warning'} mb-3`}>
+        {isConnected ? 'Connected for real-time collaboration' : 'Connecting...'}
+      </div>
+
       <div className="form-group d-flex gap-2 item-align-center">
         <label className="my-auto" htmlFor="title">
           Title:
@@ -139,10 +190,12 @@ const Editor = () => {
           className="form-control"
           value={title}
           onChange={(e) => {
-            setTitle(e.target.value);
+            const newTitle = e.target.value;
+            setTitle(newTitle);
+            // Emit real-time update to other users
             socket.emit("documentUpdate", {
               documentId: documentId || sharedId,
-              title: e.target.value,
+              title: newTitle,
               content,
             });
           }}
@@ -150,7 +203,7 @@ const Editor = () => {
         <button
           className="btn btn-danger"
           onClick={() => {
-            handleUpdate;
+            handleUpdate();
             navigate(`/dashboard`);
           }}
         >
@@ -159,21 +212,6 @@ const Editor = () => {
       </div>
       <div className="form-group mt-3">
         <label htmlFor="content">Content:</label>
-        {/* <textarea
-          id="content"
-          className="form-control"
-          rows="10"
-          value={content}
-          onChange={(e) => {
-            setContent(e.target.value);
-            socket.emit("documentUpdate", {
-              documentId: documentId || sharedId,
-              title,
-              content: e.target.value,
-            });
-            handleUpdate();
-          }}
-        /> */}
         <div id="content">
           <TinyMCEEditor
             apiKey={tinyMceApiKey}
@@ -186,6 +224,7 @@ const Editor = () => {
             value={content}
             onEditorChange={(newContent) => {
               setContent(newContent);
+              // Emit real-time update to other users
               socket.emit("documentUpdate", {
                 documentId: documentId || sharedId,
                 title,

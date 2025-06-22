@@ -20,7 +20,7 @@ const server = http.createServer(app); // Create HTTP server using Express app
 // Enable Cross-Origin Resource Sharing (CORS)
 app.use(
   cors({
-    origin: { FRONTEND_URL }, // Allow only this origin (Frontend URL)
+    origin: FRONTEND_URL, // Fixed: Remove the object wrapper
     methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   })
@@ -29,7 +29,7 @@ app.use(
 // Socket.io setup for real-time collaboration
 const io = new Server(server, {
   cors: {
-    origin: { FRONTEND_URL },
+    origin: FRONTEND_URL, // Fixed: Remove the object wrapper
     methods: ["GET", "POST"],
   },
 });
@@ -42,17 +42,81 @@ app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/search", searchDocumentRoutes);
 
+// Store active users in each document
+const documentUsers = new Map();
+
 io.on("connection", (socket) => {
-  // console.log("New Socket connection", socket.id);
+  console.log("New Socket connection", socket.id);
 
   socket.on("joinDocument", (documentId) => {
+    if (!documentId) return;
+    
     socket.join(documentId);
-    console.log(`User joined the document ${documentId}`);
+    
+    // Track users in this document
+    if (!documentUsers.has(documentId)) {
+      documentUsers.set(documentId, new Set());
+    }
+    documentUsers.get(documentId).add(socket.id);
+    
+    console.log(`User ${socket.id} joined document ${documentId}`);
+    console.log(`Active users in document ${documentId}:`, documentUsers.get(documentId).size);
   });
-  // user when changes the input feild values
+
+  // Handle when user leaves a specific document
+  socket.on("leaveDocument", (documentId) => {
+    if (!documentId) return;
+    
+    socket.leave(documentId);
+    
+    // Remove user from tracking
+    if (documentUsers.has(documentId)) {
+      documentUsers.get(documentId).delete(socket.id);
+      console.log(`User ${socket.id} left document ${documentId}`);
+      
+      // If no users left in document, clean up
+      if (documentUsers.get(documentId).size === 0) {
+        documentUsers.delete(documentId);
+        console.log(`No users left in document ${documentId}, cleaned up`);
+      }
+    }
+  });
+
+  // Handle document updates from users
   socket.on("documentUpdate", ({ documentId, title, content }) => {
+    if (!documentId) return;
+    
+    // Broadcast to other users in the same document
     socket.to(documentId).emit("receiveUpdate", { title, content });
-    console.log(`User updated document ${documentId}, ${title} , ${content}`);
+    console.log(`User ${socket.id} updated document ${documentId}`);
+  });
+
+  // Handle document updates (alternative event name)
+  socket.on("updateDocument", ({ documentId, title, content }) => {
+    if (!documentId) return;
+    
+    // Broadcast to other users in the same document
+    socket.to(documentId).emit("receiveUpdate", { title, content });
+    console.log(`User ${socket.id} updated document ${documentId} (via updateDocument)`);
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log(`User ${socket.id} disconnected`);
+    
+    // Remove user from all documents they were in
+    for (const [documentId, users] of documentUsers.entries()) {
+      if (users.has(socket.id)) {
+        users.delete(socket.id);
+        console.log(`User ${socket.id} left document ${documentId}`);
+        
+        // If no users left in document, clean up
+        if (users.size === 0) {
+          documentUsers.delete(documentId);
+          console.log(`No users left in document ${documentId}, cleaned up`);
+        }
+      }
+    }
   });
 });
 
